@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>DATAWIZZ 2.0</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+			body {
+				background-color: #F5F5F5;
+                background-image: url(https://th.bing.com/th?id=OIP.0mmu8DYQ6oI2C7tXL9zHjgHaFV&w=294&h=212&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2);
+				font-family: Arial, sans-serif;
+			}
+			
+			h1 {
+				color: #0fc0c0;
+				text-align: center;
+			}
+			
+			form {
+				background-color: #ffffff12;
+				border-radius: 5px;
+				box-shadow: 0 0 5px #ffffff;
+				padding: 20px;
+				margin: auto;
+				max-width: 500px;
+			}
+			
+			label {
+				display: block;
+				margin-bottom: 10px;
+				color: #9acaca;
+			}
+			
+			input[type="text"], input[type="file"] {
+				padding: 10px;
+				border: none;
+				border-radius: 5px;
+				background-color: #324571d2;
+				box-shadow: inset 0 0 3px #BDBDBD;
+				width: 100%;
+				margin-bottom: 20px;
+			}
+			
+			input[type="submit"] {
+				background-color: #2F4F4F;
+				color: #FFFFFF;
+				padding: 10px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			
+			input[type="submit"]:hover {
+				background-color: #556B2F;
+			}
+            
+            /* Add responsive design */
+			@media only screen and (max-width: 600px) {
+				form {
+					max-width: 100%;
+				}
+			}
+            
+            /* Style input file button for smaller screens */
+            @media only screen and (max-width: 400px) {
+                input[type="file"]::-webkit-file-upload-button {
+                  background-color: #2F4F4F;
+                  color: #FFFFFF;
+                  padding: 5px;
+                  border: none;
+                  border-radius: 5px;
+                  cursor: pointer;
+                  font-size: 14px;
+                }
+            
+                input[type="file"]::-webkit-file-upload-button:hover {
+                  background-color: #556B2F;
+                }
+                
+                input[type="submit"] {
+                    font-size: 14px;
+                }
+			}
+
+		</style>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+        <script>
+// Wait for the DOM to load
+document.addEventListener("DOMContentLoaded", function() {
+	// Get the form element
+	var form = document.getElementById("convert-form");
+
+	// Add a submit event listener to the form
+	form.addEventListener("submit", function(event) {
+		// Prevent the default form submission behavior
+		event.preventDefault();
+
+		// Get the input file and output file values
+		var inputFile = document.getElementById("input-file").files[0];
+		var outputFile = document.getElementById("output-file").value;
+
+		// Check if the input file is a text file
+		if (inputFile.type !== "text/plain") {
+			alert("Please select a text file to convert!");
+			return;
+		}
+
+		// Convert the text file to Excel
+		convertTextFileToExcel(inputFile, outputFile);
+	});
+
+	// Function to convert a text file to Excel
+	function convertTextFileToExcel(inputFile, outputFile) {
+		// Create a new workbook and worksheet
+		var workbook = XLSX.utils.book_new();
+		var worksheet = XLSX.utils.aoa_to_sheet([[]]);
+
+		// Read the contents of the input file
+		var reader = new FileReader();
+		reader.onload = function(event) {
+			var contents = event.target.result;
+			contents = contents.replace(/  +/g, ' ');
+			contents = contents.replace(/\r\n|\r|\n/g, ' ');
+			var rows = contents.split("HB");
+			var currentRow = [];
+			// Loop through all the rows and split them into columns
+			for (var i = 0; i < rows.length; i++) {
+				var row = rows[i];
+				if (row.trim() !== "") {
+					row = row.trim();
+					// Add "HB" to the beginning of the row
+					row = "HB" + row;
+					// Add the current row to the worksheet if it is not empty
+					if (currentRow.length > 0) {
+						XLSX.utils.sheet_add_aoa(worksheet, [currentRow], {origin: -1});
+					}
+					// Start a new row
+					currentRow = row.split("/");
+				} else {
+					// Add the columns to the current row
+					currentRow = currentRow.concat(row.split("/"));
+				}
+			}
+			// Add the last row to the worksheet if it is not empty
+			if (currentRow.length > 0) {
+				XLSX.utils.sheet_add_aoa(worksheet, [currentRow], {origin: -1});
+			}
+			// Add the worksheet to the workbook
+			XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+			// Save the workbook to a file
+			XLSX.writeFile(workbook, outputFile);
+			alert("Conversion complete!");
+		};
+		reader.readAsText(inputFile);
+	}
+});
+
+          </script>
+          
+	
+		
+	</head>
+	<body>
+		<h1>VINNU'S DATAWIZZ 2.0</h1>
+		<form id="convert-form">
+			<label for="input-file">Input file:</label>
+			<input type="file" id="input-file" accept=".txt">
+			<label for="output-file">Output file:</label>
+			<input type="text" id="output-file" value="output.xlsx">
+			<input type="submit" value="Convert">
+		</form>
+	</body>
+</html>
+
+
+
